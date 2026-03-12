@@ -573,6 +573,7 @@ var dark_mode_main = {
                 if ('mode_status' in changes) {
                     if (changes.mode_status.newValue == 'off') {
                         dark_mode_main.normalize_document(main_data.lock_brightness);
+                        dnm_set_brg(main_data.document_brightness);
                     } else if (changes.mode_status.newValue == 'on') {
                         dark_mode_main.update_loaded_document();
                     } else if (changes.mode_status.newValue == 'auto') {
@@ -595,15 +596,11 @@ var dark_mode_main = {
                         }
                     }
                 }
-                if (data.mode_status != 'off') {
-                    if (data.mode_status == 'auto') {
-                        if (! dnm_is_auto_time_active()) {
-                            return;
-                        }
+                if ('document_brightness' in changes) {
+                    if (data.mode_status == 'auto' && ! dnm_is_auto_time_active()) {
+                        return;
                     }
-                    if ('document_brightness' in changes) {
-                        dnm_set_brg(changes.document_brightness.newValue);
-                    }
+                    dnm_set_brg(changes.document_brightness.newValue);
                 }
             }
             if (data.mode_status == 'on' || data.mode_status == 'auto') {
@@ -670,6 +667,10 @@ chrome.storage.local.get({'mode_status':'on','document_brightness':55,'whitelist
             if (is_custom_site === false) {
                 dark_mode_main.update_document();
             }
+        });
+    } else if (status == 'off') {
+        document.addEventListener("DOMContentLoaded", function(event) {
+            dnm_set_brg(data.document_brightness);
         });
     }
 });

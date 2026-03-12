@@ -62,12 +62,20 @@ html,body {
 li.dnmo-li-option-name {
     height: 40px;
     text-transform: capitalize;
-    background-color: #171717;
     font-weight: 100;
     text-indent: 10px;
     font-size: 15px;
     letter-spacing: 1px;
     padding: 11px 0px;
+}
+
+li.dnmo-li-option-name > a {
+    text-decoration: none;
+    color: inherit;
+}
+
+li.dnmo-li-option-name.dnmo-lilp-active {
+    background-color: #171717;
 }
 #dnmo-right-part {
     width: calc(100% - 220px);
@@ -76,7 +84,15 @@ li.dnmo-li-option-name {
     position: relative;
 }
 
-#dnmo-right-part > div {height: calc(100% - 40px);overflow-y: scroll;padding-right:  7px;}
+.dnm-rs-content-boxes {height: calc(100% - 40px);overflow-y: scroll;padding-right:  7px;}
+
+.dnm-rs-content-boxes {
+    display: none;
+}
+
+.dnm-rs-content-boxes.dnm-content-box-active {
+    display: block;
+}
 span.dnmo-octdd {
     font-size: 21px;
     font-weight: 200;
@@ -129,7 +145,55 @@ li.dnmo-lw-li > span:last-child {
     border-top: 1px solid #3f3f3f;
     /* border-left: 1px solid #ddd; */
 }
+.dnmo-cb-content-wrapper {
+    padding: 20px;
+}
 
+.dnmo-cb-option-box {
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.dnmo-cb-option-box > div {
+    float: left;
+}
+
+.dnmo-ob-left {
+    width: 280px;
+}
+
+.dnmo-ob-right {
+    width: calc(100% - 280px);
+    overflow: hidden;
+}
+
+.dnmo-ob-name {
+    font-size: 32px;
+    font-weight: 200;
+    letter-spacing: -0.3px;
+    margin-bottom: 5px;
+}
+
+.dnmo-ob-desc {
+    font-size: 9.3px;
+    width: 200px;
+    letter-spacing: 0.9px;
+    font-weight: 100;
+    color: #6f7070;
+}
+
+.dnmo-itime-boxes {
+    float: right;
+    border: 0px;
+    border-radius: 3px;
+    height: 45px;
+    width: 120px;
+    background-color: #171717;
+    color: #adabab;
+    text-align: center;
+    padding-right: inherit;
+    font-size: 15px;
+}
 .dnmo-save-button {
     width: 70px;
     float: right;

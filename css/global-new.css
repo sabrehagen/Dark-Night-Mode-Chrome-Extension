@@ -1,5 +1,6 @@
-html, html * {
+html, html > body *,html > body *[class],html > body *[id] {
 color: rgb(183, 183, 183) !important;}
+
 *{border-color:#a4afaf !important;}
 
 input[type="button"]:hover, input[type="submit"]:not(.color):hover,
@@ -8,12 +9,18 @@ input[type="reset"]:hover, button:hover, select:hover {
   background-color: #303030 !important;
 }
 
-
+html > body[class] a,html > body[class] a[class] {
+  color: #6091c1 !important;
+}
 a, a[class] {
   color: #6091c1 !important;
 }
-
-
+html > body svg[class] {
+    fill: rgb(183, 183, 183);
+}
+html > body svg {
+    fill: rgb(183, 183, 183);
+}
 li {
   color: #004db3 !important;
 }

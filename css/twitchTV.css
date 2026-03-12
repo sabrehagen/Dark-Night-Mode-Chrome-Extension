@@ -459,7 +459,54 @@ p {
     border: 1px solid var(--bordercolor)!important;
     color: var(--textcolor)!important;
 }
+.conversations-list .conversations-list-header {
+    background: #383737;
+}
 
+.js-conversations-list-inner.conversations-list-inner.scroll-container {
+    background-color: #1c1c1c;
+}
+
+.conversations-content .conversations-list-bottom-bar {
+    background: #383737;
+}
+
+.conversations-list .scroll-container {
+    background-color: #1c1c1c;
+}
+
+.conversations-list .conversations-list-item,.conversations-list .search-divider {
+    border-bottom: 1px solid #2d2d2d;
+}
+
+
+.conversation-name {
+    color: #cccccc;
+}
+
+.conversations-list .conversations-list-item:hover {
+    background-color: #383737;
+}
+
+.js-conversations-list.conversations-list {
+    border: 1px solid #2d2d2d;
+}
+
+.conversations-list-header.flex.flex--verticalCenter {
+    border-bottom: 1px solid #2d2d2d;
+}
+
+.conversations-content .conversations-list-bottom-bar {
+    border-color: #2d2d2d;
+}
+
+.conversation-settings-menu {
+    background-color: #383737;
+    border-color: #2d2d2d;
+}
+.directory_header h2.title {
+    color: #c7cccc;
+}
 .tw-c-text-alert, .tw-c-text-live, .tw-theme--dark .tw-c-text-alert, .tw-theme--dark .tw-c-text-live, .tw-theme--light .tw-c-text-alert, .tw-theme--light .tw-c-text-live {
     color: var(--purple)!important;
 }

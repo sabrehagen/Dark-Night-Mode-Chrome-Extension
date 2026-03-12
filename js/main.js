@@ -2,7 +2,18 @@ var is_head_added   = false,
     is_black_colred = false,
     is_custom_css   = false,
     head = document.documentElement || document.head || document.querySelector("head");
+// Apply cached brightness synchronously before any async call to eliminate
+// the white flash that occurs during the chrome.storage.local.get round-trip.
+(function () {
+    try {
+        var val = parseInt(localStorage.getItem('dnm_brightness'), 10);
+        if (!isNaN(val) && val >= 11 && val <= 100 && (val < 50 || val > 60)) {
+            document.documentElement.style.setProperty('filter', 'brightness(' + (val * 1.8) + '%)', 'important');
+        }
+    } catch (e) {}
+}());
 var document_observer = new MutationObserver(function (mutations) {
+    if (!is_black_colred) return;
     if (document.head && is_head_added === false) {
         dark_mode_main.append_css_element();
         is_head_added = true;
@@ -598,6 +609,7 @@ var dark_mode_main = {
                     if (data.mode_status == 'auto' && ! dnm_is_auto_time_active()) {
                         return;
                     }
+                    try { localStorage.setItem('dnm_brightness', changes.document_brightness.newValue); } catch (e) {}
                     dnm_set_brg(changes.document_brightness.newValue);
                 }
             }
@@ -619,6 +631,7 @@ var dark_mode_main = {
     }
 }
 chrome.storage.local.get({'mode_status':'on','document_brightness':55,'whitelist':{},'lock_brightness': 'off'},function (data) {
+    try { localStorage.setItem('dnm_brightness', data.document_brightness); } catch (e) {}
     var sitename        = dark_mode_main.hostname(window.location.href),
         brg_applied     = false,
         main_data       = data,

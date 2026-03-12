@@ -516,8 +516,7 @@ var dark_mode_main = {
      */
     normalize_document: function(lock_brg) {
         if (lock_brg == 'off') {
-            document.body.style.removeProperty('filter');
-            //debugger;
+            document.documentElement.style.removeProperty('filter');
         }
         document_body_observer.disconnect();
         document_attr_observer.disconnect();
@@ -546,7 +545,7 @@ var dark_mode_main = {
                 brg_applied = false;
             if (main_data.lock_brightness == 'on' && ! ('document_brightness' in changes)) {
                 if (sitename in main_data.whitelist) {
-                    document.body.style.removeProperty('filter');
+                    document.documentElement.style.removeProperty('filter');
                 } else {
                     brg_applied = true;
                     dnm_set_brg_fix();
@@ -560,7 +559,6 @@ var dark_mode_main = {
                     }
                 } else {
                     if (changes.lock_brightness.newValue == 'off') {
-                        document.body.style.removeProperty('filter');
                         document.documentElement.style.removeProperty('filter');
                         document.documentElement.style.removeProperty('background');
                         document.documentElement.style.removeProperty('height');
@@ -652,6 +650,8 @@ chrome.storage.local.get({'mode_status':'on','document_brightness':55,'whitelist
         }
         document.documentElement.style.backgroundColor = "rgb(0,0,0)";
         is_black_colred = true;
+        dnm_set_brg(data.document_brightness);
+        brg_applied = true;
         if (is_custom_site === false) {
             dark_mode_main.start_observing();
         }
@@ -661,17 +661,12 @@ chrome.storage.local.get({'mode_status':'on','document_brightness':55,'whitelist
             subtree:true
         });
         document.addEventListener("DOMContentLoaded", function(event) {
-            if (brg_applied === false) {
-                dnm_set_brg(data.document_brightness);
-            }
             if (is_custom_site === false) {
                 dark_mode_main.update_document();
             }
         });
     } else if (status == 'off') {
-        document.addEventListener("DOMContentLoaded", function(event) {
-            dnm_set_brg(data.document_brightness);
-        });
+        dnm_set_brg(data.document_brightness);
     }
 });
 chrome.storage.onChanged.addListener(dark_mode_main.trigger_status_change);
@@ -683,10 +678,10 @@ chrome.storage.onChanged.addListener(dark_mode_main.trigger_status_change);
  */
 function dnm_set_brg(value) {
     if (value >= 50 && value <= 60) {
-        document.body.style.removeProperty('filter');
+        document.documentElement.style.removeProperty('filter');
         return;
     }
-    document.body.style.setProperty('filter','brightness('+value * 1.8+'%)','important');
+    document.documentElement.style.setProperty('filter','brightness('+value * 1.8+'%)','important');
 }
 /**
  * Set color to the html element so brightness works properly

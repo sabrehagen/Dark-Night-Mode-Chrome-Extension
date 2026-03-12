@@ -146,7 +146,6 @@ var dark_mode_main = {
         'news.google.com'   :'NewsGoogle',
         'www.twitch.tv'     :'twitchTV',
         'twitter.com'       :'twitter',
-        'github.com'        :'github',
         'accounts.google.com':'InboxGoogle',
         'inbox.google.com'  :'InboxGoogle',
         'www.quora.com'     : 'quora',
@@ -362,7 +361,7 @@ var dark_mode_main = {
             if (! (current_color in this.curr_obj)) {
                 data            = this.get_rgb_data(current_color);
                 sum_color       = data.sum;
-                if (sum_color >= '740' && sum_color <= '765') {
+                if (sum_color >= '740') {
                     curr_opacity    = 0.09;
                 } else if (sum_color >= '710' && sum_color < '740') {
                     curr_opacity    = 0.18;

@@ -35,6 +35,11 @@
             "run_at": "document_start",
             "exclude_globs": ["*/chrome/newtab*"],
             "css": ["css/universal.css"]
+        },
+        {
+            "matches": ["*://github.com/*"],
+            "run_at": "document_start",
+            "css": ["css/github-early.css"]
         }
     ]
 }

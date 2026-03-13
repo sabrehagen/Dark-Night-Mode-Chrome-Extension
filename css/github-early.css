@@ -1,0 +1,17 @@
+/* Early-inject dark background for GitHub elements that flash white before main.js runs */
+
+body,
+.pagehead-actions .btn,
+.pagehead-actions .social-count,
+.pagehead-actions .BtnGroup,
+.pagehead-actions .BtnGroup-item,
+.starring-container .btn,
+.starring-container .social-count,
+.watch-menu .btn,
+.fork-button .btn,
+.btn-sm,
+.BtnGroup .btn {
+  background-color: #2a2a2a !important;
+  border-color: #444 !important;
+  color: #d0d0d0 !important;
+}

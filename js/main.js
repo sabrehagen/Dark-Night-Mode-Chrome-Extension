@@ -90,8 +90,8 @@ var dark_mode_main = {
     * @param {object} current_node The DOM node to process
     * @return void
     */
-    process_gradient: function(current_node) {
-        var bgImage = this.current_dfc.getComputedStyle(current_node, null).backgroundImage;
+    process_gradient: function(current_node, computedStyle) {
+        var bgImage = (computedStyle || this.current_dfc.getComputedStyle(current_node, null)).backgroundImage;
         if (!bgImage || bgImage === 'none' || bgImage.indexOf('gradient') === -1) return;
         var newBgImage = bgImage.replace(/rgba?\([^)]+\)/g, function(colorStr) {
             var nums = colorStr.match(/[\d.]+/g);
@@ -423,7 +423,8 @@ var dark_mode_main = {
         if ('is_dnm_processed' in current_node && current_node.is_dnm_processed === true) {
             return;
         }
-        current_color   =       this.current_dfc.getComputedStyle(current_node,null).backgroundColor;
+        var computedStyle = this.current_dfc.getComputedStyle(current_node, null);
+        current_color   = computedStyle.backgroundColor;
         if (current_color && current_color != this.blank_color) {
             var bgcolor;
             if (current_color.indexOf('rgb') === 0) {
@@ -466,7 +467,7 @@ var dark_mode_main = {
                 }
             }
         }
-        this.process_gradient(current_node);
+        this.process_gradient(current_node, computedStyle);
     },
     /**
      * Process a all nodes
@@ -555,7 +556,8 @@ var dark_mode_main = {
             if (current_node.is_dnm_processed == true) {
                 continue;
             }
-            current_color   = this.current_dfc.getComputedStyle(current_node,null).backgroundColor;
+            var nodeStyle   = this.current_dfc.getComputedStyle(current_node, null);
+            current_color   = nodeStyle.backgroundColor;
             if (current_color != this.blank_color) {
                 var bgcolor;
                 if (current_color.indexOf('rgb') === 0) {
@@ -597,7 +599,7 @@ var dark_mode_main = {
                 }
             }
             //current_node.style.setProperty('color', 'rgb(183, 183, 183)', 'important');
-            dark_mode_main.process_gradient(current_node);
+            dark_mode_main.process_gradient(current_node, nodeStyle);
         }
         dark_mode_main.start_attr_observing();
         /*if (current_node.classList.indexOf('l-main-content') > -1) {

@@ -15,3 +15,24 @@ body,
   border-color: #444 !important;
   color: #d0d0d0 !important;
 }
+
+/* Primer component buttons (Button--primary, Button--secondary, etc.) */
+.Button,
+.Button--secondary,
+.Button--primary,
+.Button--danger,
+.Button--invisible,
+.Button-label,
+.Button-content,
+.Button-leadingVisual,
+.Button-trailingVisual {
+  color: #d0d0d0 !important;
+  border-color: #444 !important;
+}
+
+/* Repo card nav tabs (Code, Issues, PRs, etc.) */
+.tabnav-tab,
+.tabnav-tab.selected,
+.UnderlineNav-item {
+  color: #d0d0d0 !important;
+}

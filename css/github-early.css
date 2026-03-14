@@ -36,3 +36,11 @@ body,
 .UnderlineNav-item {
   color: #d0d0d0 !important;
 }
+
+/* Preserve semantic icon colors (GitHub Actions status, sponsors heart, etc.)
+   Specificity (0,2,3) beats global-new.css svg[class] (0,1,3) even when injected first */
+html > body svg.octicon[class*="color-fg-success"] { fill: #3fb950 !important; color: #3fb950 !important; }
+html > body svg.octicon[class*="color-fg-danger"]  { fill: #f85149 !important; color: #f85149 !important; }
+html > body svg.octicon[class*="color-fg-attention"] { fill: #d29922 !important; color: #d29922 !important; }
+html > body svg.octicon[class*="color-fg-done"]    { fill: #a371f7 !important; color: #a371f7 !important; }
+html > body svg.octicon[class*="color-fg-sponsors"] { fill: #db61a2 !important; color: #db61a2 !important; }

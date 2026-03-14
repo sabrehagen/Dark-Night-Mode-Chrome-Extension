@@ -55,6 +55,73 @@ var dark_mode_main = {
     },
     current_dfc : document.defaultView,
     /**
+    * Convert non-rgb color formats (oklch, hsl, lch, etc.) to a dark rgb color
+    * by extracting lightness and mapping to an appropriate dark grey.
+    * Returns null if the color is already dark enough to skip.
+    * @param {string} color The color string in a non-rgb format
+    * @return {string|null} Dark rgb color string, or null to skip
+    */
+    get_dark_color_from_non_rgb: function(color) {
+        var L = null;
+        var oklchMatch = color.match(/oklch\(\s*([\d.]+)(%?)/i);
+        if (oklchMatch) {
+            L = parseFloat(oklchMatch[1]);
+            if (oklchMatch[2] === '%') L = L / 100;
+        }
+        if (L === null) return null;
+        var sum_equiv = Math.round(L * 765);
+        var opacity;
+        if (sum_equiv >= 740)      { opacity = 0.09; }
+        else if (sum_equiv >= 710) { opacity = 0.18; }
+        else if (sum_equiv >= 680) { opacity = 0.24; }
+        else if (sum_equiv >= 580) { opacity = 0.28; }
+        else if (sum_equiv >= 500) { opacity = 0.35; }
+        else if (sum_equiv >= 400) { opacity = 0.45; }
+        else if (sum_equiv >= 300) { opacity = 0.60; }
+        else if (sum_equiv >= 200) { opacity = 0.75; }
+        else if (sum_equiv >= 80)  { opacity = 0.90; }
+        else { return null; }
+        var v = Math.round(255 * opacity);
+        return 'rgb(' + v + ',' + v + ',' + v + ')';
+    },
+    /**
+    * Process background-image gradients on a node, replacing light colors with
+    * dark equivalents so fade-out overlays don't show white in dark mode.
+    * @param {object} current_node The DOM node to process
+    * @return void
+    */
+    process_gradient: function(current_node) {
+        var bgImage = this.current_dfc.getComputedStyle(current_node, null).backgroundImage;
+        if (!bgImage || bgImage === 'none' || bgImage.indexOf('gradient') === -1) return;
+        var newBgImage = bgImage.replace(/rgba?\([^)]+\)/g, function(colorStr) {
+            var nums = colorStr.match(/[\d.]+/g);
+            if (!nums || nums.length < 3) return colorStr;
+            var r = parseInt(nums[0]), g = parseInt(nums[1]), b = parseInt(nums[2]);
+            var a = nums.length > 3 ? parseFloat(nums[3]) : 1;
+            var sum = r + g + b;
+            if (sum < 200) return colorStr;
+            var opacity;
+            if      (sum >= 740) { opacity = 0.09; }
+            else if (sum >= 710) { opacity = 0.18; }
+            else if (sum >= 680) { opacity = 0.24; }
+            else if (sum >= 580) { opacity = 0.28; }
+            else if (sum >= 500) { opacity = 0.35; }
+            else if (sum >= 400) { opacity = 0.45; }
+            else if (sum >= 300) { opacity = 0.60; }
+            else                 { opacity = 0.75; }
+            var nr = Math.round(r * opacity);
+            var ng = Math.round(g * opacity);
+            var nb = Math.round(b * opacity);
+            if (a < 1) {
+                return 'rgba(' + nr + ',' + ng + ',' + nb + ',' + a + ')';
+            }
+            return 'rgb(' + nr + ',' + ng + ',' + nb + ')';
+        });
+        if (newBgImage !== bgImage) {
+            current_node.style.setProperty('background-image', newBgImage, 'important');
+        }
+    },
+    /**
     * Array reduce method
     * to get sum of values
     */
@@ -358,38 +425,48 @@ var dark_mode_main = {
         }
         current_color   =       this.current_dfc.getComputedStyle(current_node,null).backgroundColor;
         if (current_color && current_color != this.blank_color) {
-            if (! (current_color in this.curr_obj)) {
-                data            = this.get_rgb_data(current_color);
-                sum_color       = data.sum;
-                if (sum_color >= '740') {
-                    curr_opacity    = 0.09;
-                } else if (sum_color >= '710' && sum_color < '740') {
-                    curr_opacity    = 0.18;
-                } else if (sum_color >= '680' && sum_color < '710') {
-                    curr_opacity    = 0.24;
-                } else if (sum_color >= '580' && sum_color < '680') {
-                    curr_opacity    = 0.28;
-                } else if (sum_color >= '500' && sum_color < '580') {
-                    curr_opacity    = 0.35;
-                } else if (sum_color >= '400' && sum_color < '500') {
-                    curr_opacity    = 0.45;
-                } else if (sum_color >= '300' && sum_color < '400') {
-                    curr_opacity    = 0.60;
-                } else if (sum_color >= '200' && sum_color < '300') {
-                    curr_opacity    = 0.75;
-                } else if (sum_color >= '80' && sum_color < '200') {
-                    curr_opacity    = 0.90;
-                } else if (sum_color < '80') {
-                    curr_opacity    = 1;
+            var bgcolor;
+            if (current_color.indexOf('rgb') === 0) {
+                if (! (current_color in this.curr_obj)) {
+                    data            = this.get_rgb_data(current_color);
+                    sum_color       = data.sum;
+                    if (sum_color >= '740') {
+                        curr_opacity    = 0.09;
+                    } else if (sum_color >= '710' && sum_color < '740') {
+                        curr_opacity    = 0.18;
+                    } else if (sum_color >= '680' && sum_color < '710') {
+                        curr_opacity    = 0.24;
+                    } else if (sum_color >= '580' && sum_color < '680') {
+                        curr_opacity    = 0.28;
+                    } else if (sum_color >= '500' && sum_color < '580') {
+                        curr_opacity    = 0.35;
+                    } else if (sum_color >= '400' && sum_color < '500') {
+                        curr_opacity    = 0.45;
+                    } else if (sum_color >= '300' && sum_color < '400') {
+                        curr_opacity    = 0.60;
+                    } else if (sum_color >= '200' && sum_color < '300') {
+                        curr_opacity    = 0.75;
+                    } else if (sum_color >= '80' && sum_color < '200') {
+                        curr_opacity    = 0.90;
+                    } else if (sum_color < '80') {
+                        curr_opacity    = 1;
+                    }
+                    bgcolor = this.get_darker_shade(data.value,curr_opacity);
+                    this.curr_obj[current_color] = bgcolor;
+                } else {
+                    bgcolor = this.curr_obj[current_color];
                 }
-                var bgcolor = this.get_darker_shade(data.value,curr_opacity);
-                this.curr_obj[current_color] = bgcolor;
+                current_node.style.setProperty('background', bgcolor, 'important');
+                current_node.is_dnm_processed = true;
             } else {
-                var bgcolor = this.curr_obj[current_color];
+                bgcolor = this.get_dark_color_from_non_rgb(current_color);
+                if (bgcolor !== null) {
+                    current_node.style.setProperty('background', bgcolor, 'important');
+                    current_node.is_dnm_processed = true;
+                }
             }
-            current_node.style.setProperty('background', bgcolor, 'important');
-            current_node.is_dnm_processed = true;
         }
+        this.process_gradient(current_node);
     },
     /**
      * Process a all nodes
@@ -480,38 +557,47 @@ var dark_mode_main = {
             }
             current_color   = this.current_dfc.getComputedStyle(current_node,null).backgroundColor;
             if (current_color != this.blank_color) {
-                if (! (current_color in this.curr_obj)) {
-                    data            = this.get_rgb_data(current_color);
-                    sum_color       = data.sum;
-                    if (sum_color >= '740' && sum_color <= '765') {
-                        curr_opacity    = 0.09;
-                    } else if (sum_color >= '710' && sum_color < '740') {
-                        curr_opacity    = 0.18;
-                    } else if (sum_color >= '680' && sum_color < '710') {
-                        curr_opacity    = 0.24;
-                    } else if (sum_color >= '580' && sum_color < '680') {
-                        curr_opacity    = 0.28;
-                    } else if (sum_color >= '500' && sum_color < '580') {
-                        curr_opacity    = 0.35;
-                    } else if (sum_color >= '400' && sum_color < '500') {
-                        curr_opacity    = 0.45;
-                    } else if (sum_color >= '300' && sum_color < '400') {
-                        curr_opacity    = 0.60;
-                    } else if (sum_color >= '200' && sum_color < '300') {
-                        curr_opacity    = 0.75;
-                    } else if (sum_color >= '80' && sum_color < '200') {
-                        curr_opacity    = 0.90;
-                    } else if (sum_color < '80') {
-                        curr_opacity    = 1;
+                var bgcolor;
+                if (current_color.indexOf('rgb') === 0) {
+                    if (! (current_color in this.curr_obj)) {
+                        data            = this.get_rgb_data(current_color);
+                        sum_color       = data.sum;
+                        if (sum_color >= '740' && sum_color <= '765') {
+                            curr_opacity    = 0.09;
+                        } else if (sum_color >= '710' && sum_color < '740') {
+                            curr_opacity    = 0.18;
+                        } else if (sum_color >= '680' && sum_color < '710') {
+                            curr_opacity    = 0.24;
+                        } else if (sum_color >= '580' && sum_color < '680') {
+                            curr_opacity    = 0.28;
+                        } else if (sum_color >= '500' && sum_color < '580') {
+                            curr_opacity    = 0.35;
+                        } else if (sum_color >= '400' && sum_color < '500') {
+                            curr_opacity    = 0.45;
+                        } else if (sum_color >= '300' && sum_color < '400') {
+                            curr_opacity    = 0.60;
+                        } else if (sum_color >= '200' && sum_color < '300') {
+                            curr_opacity    = 0.75;
+                        } else if (sum_color >= '80' && sum_color < '200') {
+                            curr_opacity    = 0.90;
+                        } else if (sum_color < '80') {
+                            curr_opacity    = 1;
+                        }
+                        bgcolor = this.get_darker_shade(data.value,curr_opacity);
+                        this.curr_obj[current_color] = bgcolor;
+                    } else {
+                        bgcolor = this.curr_obj[current_color];
                     }
-                    var bgcolor = this.get_darker_shade(data.value,curr_opacity);
-                    this.curr_obj[current_color] = bgcolor;
+                    current_node.style.setProperty('background', bgcolor, 'important');
                 } else {
-                    var bgcolor = this.curr_obj[current_color];
+                    bgcolor = this.get_dark_color_from_non_rgb(current_color);
+                    if (bgcolor !== null) {
+                        current_node.style.setProperty('background', bgcolor, 'important');
+                    }
                 }
-                current_node.style.setProperty('background', bgcolor, 'important');
             }
             //current_node.style.setProperty('color', 'rgb(183, 183, 183)', 'important');
+            dark_mode_main.process_gradient(current_node);
         }
         dark_mode_main.start_attr_observing();
         /*if (current_node.classList.indexOf('l-main-content') > -1) {
